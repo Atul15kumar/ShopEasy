@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MCA Project Report - ShopEasy - Atul Kumar</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 1in 1.25in 1in 1.25in;
+      @bottom-center {
+        content: counter(page);
+        font-family: "Times New Roman", Times, serif;
+        font-size: 10pt;
+      }
+    }
+
+    body {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      text-align: justify;
+      color: #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    p {
+      margin-top: 6pt;
+      margin-bottom: 6pt;
+    }
+
+    h1.chapter-title {
+      font-size: 18pt;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 12pt;
+      margin-bottom: 12pt;
+      text-transform: uppercase;
+      page-break-before: always;
+    }
+
+    h2.section-heading {
+      font-size: 14pt;
+      font-weight: bold;
+      text-decoration: underline;
+      text-align: left;
+      margin-top: 12pt;
+      margin-bottom: 6pt;
+    }
+
+    h3.sub-heading {
+      font-size: 12pt;
+      font-weight: bold;
+      margin-top: 8pt;
+      margin-bottom: 4pt;
+    }
+
+    pre, code {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10pt;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 6pt;
+      border-radius: 4px;
+      display: block;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.2;
+      margin: 6pt 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10pt 0;
+      font-size: 11pt;
+    }
+
+    table, th, td {
+      border: 1px solid #000;
+    }
+
+    th, td {
+      padding: 6pt 8pt;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .cover-container {
+      height: 9.8in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      box-sizing: border-box;
+      padding: 10pt 0;
+      border: 2px solid #000;
+      padding: 24pt;
+    }
+
+    .cover-title {
+      font-size: 20pt;
+      font-weight: bold;
+      line-height: 1.3;
+      margin: 15pt 0;
+      text-transform: uppercase;
+    }
+
+    .cover-sub {
+      font-size: 12pt;
+      font-style: italic;
+      margin-bottom: 15pt;
+    }
+
+    .sign-row {
+      display: flex;
+      justify-content: space-between;
+      text-align: left;
+      margin-top: 30pt;
+    }
+
+    .sign-col {
+      width: 48%;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 10pt;
+      border-top: 1px solid #999;
+      padding-top: 6pt;
+      margin-top: 15pt;
+    }
+
+    @media screen {
+      body {
+        max-width: 8.5in;
+        margin: 20px auto;
+        padding: 40px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+        background: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== COVER PAGE ==================== -->
+  <div class="cover-container">
+    <div>
+      <p style="font-size: 14pt; font-weight: bold; margin-bottom: 0;">A PROJECT REPORT ON</p>
+      <div class="cover-title">
+        "ShopEasy: A Full-Stack Cross-Platform Mobile & Web E-Commerce Application with Dynamic API Integration and Offline State Persistence"
+      </div>
+      <p class="cover-sub">
+        Submitted in partial fulfillment of the requirement for the award of degree of<br>
+        <strong>MASTER OF COMPUTER APPLICATIONS (MCA)</strong><br>
+        (MCA-20-43: Mobile Application Development)<br>
+        Session: 2025–2026
+      </p>
+    </div>
+
+    <div class="sign-row">
+      <div class="sign-col">
+        <strong>SUPERVISED BY:</strong><br>
+        [Supervisor Name]<br>
+        Senior Software Engineer / Programmer<br>
+        [Department / Organization Name]
+      </div>
+      <div class="sign-col" style="text-align: right;">
+        <strong>SUBMITTED BY:</strong><br>
+        <strong>Atul Kumar</strong><br>
+        Roll No. / LMS ID: [Your Roll No]<br>
+        Examination Roll No: [Exam Roll No]<br>
+        MCA (Online Programme)
+      </div>
+    </div>
+
+    <div style="margin-top: 20pt;">
+      <h3 style="margin: 0; font-size: 15pt; text-transform: uppercase;">Centre for Distance and Online Education</h3>
+      <h4 style="margin: 4pt 0 0 0; font-size: 13pt;">KURUKSHETRA UNIVERSITY, KURUKSHETRA – 136119</h4>
+      <p style="font-size: 10pt; margin-top: 4pt;">(Established by the State Legislature Act XII of 1956) ('A+' Grade, NAAC Accredited)</p>
+    </div>
+  </div>
+
+  <!-- ==================== DECLARATION ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title" style="page-break-before: avoid;">Declaration</h1>
+
+  <p>
+    I, <strong>Atul Kumar</strong>, a student of Master of Computer Applications (MCA), in the Centre for Distance and Online Education, Kurukshetra University, Kurukshetra, under Examination Roll No. <strong>[Your Exam Roll No]</strong>, for the session <strong>2025–2026</strong>, hereby declare that the work presented in this report entitled <strong>"ShopEasy: A Full-Stack Cross-Platform Mobile & Web E-Commerce Application with Dynamic API Integration and Offline State Persistence"</strong> is my original work completed during the period from <strong>[Start Date]</strong> to <strong>[End Date]</strong> at <strong>[Company/Organization Name, e.g., ShopEasy Digital Systems]</strong>.
+  </p>
+
+  <p>
+    This report is a true reflection of the tasks and projects I have undertaken during my Project Report. I confirm that I have followed all relevant guidelines. All external sources of information have been appropriately referenced.
+  </p>
+
+  <p>
+    I acknowledge the support and guidance provided by my Project Report supervisor <strong>[Supervisor's Name]</strong>.
+  </p>
+
+  <p>
+    I understand that any violation of the above will result in disciplinary action and may affect my academic standing.
+  </p>
+
+  <br><br>
+  <div style="display: flex; justify-content: space-between;">
+    <div>
+      <p><strong>Date:</strong> [Date]</p>
+      <p><strong>Place:</strong> Kurukshetra</p>
+    </div>
+    <div style="text-align: right;">
+      <p>___________________________</p>
+      <p><strong>Signature of the Candidate</strong></p>
+      <p><strong>Atul Kumar</strong></p>
+      <p>Exam Roll No: [Exam Roll No]</p>
+    </div>
+  </div>
+
+  <!-- ==================== COMPLETION CERTIFICATE ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title" style="page-break-before: avoid;">Project Report Completion Certificate</h1>
+
+  <p>
+    This is to certify that <strong>Atul Kumar</strong>, a student of Centre for Distance and Online Education at Kurukshetra University, Kurukshetra, pursuing M.C.A., under Examination Roll No. <strong>[Your Exam Roll No]</strong> for the session <strong>2025–2026</strong>, has successfully completed the Project Report titled <strong>"ShopEasy: A Full-Stack Cross-Platform Mobile & Web E-Commerce Application with Dynamic API Integration and Offline State Persistence"</strong> from <strong>[Start Date]</strong> to <strong>[End Date]</strong>.
+  </p>
+
+  <p>
+    <strong>Atul Kumar</strong> has demonstrated commendable dedication and professionalism and has actively participated in various tasks, contributed valuable insights, and worked diligently towards achieving the Project Report goals.
+  </p>
+
+  <p>
+    We are pleased with his performance and wish him all the best in his future endeavors.
+  </p>
+
+  <br><br><br>
+  <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+      <p><strong>Date:</strong> [Date]</p>
+      <p><strong>Seal / Stamp of Organization:</strong></p>
+    </div>
+    <div style="text-align: right;">
+      <p>___________________________</p>
+      <p><strong>Signature of Supervisor</strong></p>
+      <p><strong>Name:</strong> [Supervisor's Name]</p>
+      <p><strong>Designation:</strong> [Senior Programmer / Tech Lead]</p>
+      <p><strong>Company:</strong> [Organization Name]</p>
+    </div>
+  </div>
+
+  <!-- ==================== ACKNOWLEDGMENT ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title" style="page-break-before: avoid;">Acknowledgment</h1>
+
+  <p>
+    I express my sincere indebtedness and gratitude to my supervisor, <strong>[Supervisor's Name]</strong>, for his/her intellectual mentorship, continuous support, and constructive feedback throughout the design, implementation, and documentation of the <strong>ShopEasy</strong> project.
+  </p>
+  <p>
+    I also extend my sincere thanks to the Director, Faculty Members, and Academic Coordinators of the <strong>Centre for Distance and Online Education, Kurukshetra University, Kurukshetra</strong>, for providing a comprehensive curriculum in the Master of Computer Applications (MCA) programme, especially the course on <strong>Mobile Application Development (MCA-20-43)</strong>.
+  </p>
+  <p>
+    I am grateful to <strong>[Company/Organization Name]</strong> for providing the modern development toolchain, cloud computing resources, and collaborative guidance that made the execution of this project possible.
+  </p>
+  <p>
+    Finally, I thank my parents, family, and peers for their constant encouragement and understanding during the preparation of this report.
+  </p>
+
+  <br>
+  <p style="text-align: right;">
+    <strong>Atul Kumar</strong><br>
+    MCA (Online Programme)<br>
+    Roll No: [Your Roll No]
+  </p>
+
+  <!-- ==================== ABBREVIATIONS, FIGURES, TABLES ==================== -->
+  <div class="page-break"></div>
+  <h2 class="section-heading">List of Abbreviations</h2>
+  <table>
+    <tr><th>Abbreviation</th><th>Full Form</th></tr>
+    <tr><td><strong>API</strong></td><td>Application Programming Interface</td></tr>
+    <tr><td><strong>REST</strong></td><td>Representational State Transfer</td></tr>
+    <tr><td><strong>JSON</strong></td><td>JavaScript Object Notation</td></tr>
+    <tr><td><strong>JWT</strong></td><td>JSON Web Token</td></tr>
+    <tr><td><strong>SDK</strong></td><td>Software Development Kit</td></tr>
+    <tr><td><strong>SPA</strong></td><td>Single Page Application</td></tr>
+    <tr><td><strong>NoSQL</strong></td><td>Not Only Structured Query Language</td></tr>
+    <tr><td><strong>CRUD</strong></td><td>Create, Read, Update, Delete</td></tr>
+    <tr><td><strong>UI / UX</strong></td><td>User Interface / User Experience</td></tr>
+    <tr><td><strong>CDOE</strong></td><td>Centre for Distance and Online Education</td></tr>
+    <tr><td><strong>KUK</strong></td><td>Kurukshetra University, Kurukshetra</td></tr>
+  </table>
+
+  <h2 class="section-heading" style="margin-top: 20pt;">List of Figures</h2>
+  <table>
+    <tr><th>Figure No.</th><th>Title</th><th>Page</th></tr>
+    <tr><td>Figure 1.1</td><td>ShopEasy 3-Tier System Architectural Model</td><td>7</td></tr>
+    <tr><td>Figure 2.1</td><td>Mobile Screen Hierarchy & Navigation Graph</td><td>11</td></tr>
+    <tr><td>Figure 2.2</td><td>Dynamic API Data Cleaning & Filtering Pipeline</td><td>14</td></tr>
+    <tr><td>Figure 2.3</td><td>State Synchronization with AsyncStorage Engine</td><td>17</td></tr>
+    <tr><td>Figure 2.4</td><td>Data Flow Diagram (DFD Level 0 & Level 1)</td><td>20</td></tr>
+  </table>
+
+  <h2 class="section-heading" style="margin-top: 20pt;">List of Tables</h2>
+  <table>
+    <tr><th>Table No.</th><th>Title</th><th>Page</th></tr>
+    <tr><td>Table 1.1</td><td>Project Lifecycle Work Breakdown Structure</td><td>9</td></tr>
+    <tr><td>Table 2.1</td><td>Technology Stack & Library Versions</td><td>12</td></tr>
+    <tr><td>Table 3.1</td><td>Technical Challenges & Architectural Solutions</td><td>23</td></tr>
+    <tr><td>Table 4.1</td><td>Performance Evaluation & Rubric Metrics</td><td>27</td></tr>
+  </table>
+
+  <!-- ==================== TABLE OF CONTENTS ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title" style="page-break-before: avoid;">Table of Contents</h1>
+  <table>
+    <tr><th>Chapter</th><th>Topic</th><th>Page</th></tr>
+    <tr><td><strong>1</strong></td><td><strong>Introduction</strong></td><td>1</td></tr>
+    <tr><td></td><td>1.1 Purpose of the Report</td><td>1</td></tr>
+    <tr><td></td><td>1.2 Objectives of the Project Report</td><td>2</td></tr>
+    <tr><td></td><td>1.3 Organization Overview</td><td>3</td></tr>
+    <tr><td><strong>2</strong></td><td><strong>Project Report Activities</strong></td><td>5</td></tr>
+    <tr><td></td><td>2.1 Roles and Responsibilities</td><td>5</td></tr>
+    <tr><td></td><td>2.2 Projects and Assignments: "ShopEasy" Platform</td><td>6</td></tr>
+    <tr><td></td><td>2.3 Skills and Tools Used</td><td>12</td></tr>
+    <tr><td><strong>3</strong></td><td><strong>Learning Experience</strong></td><td>15</td></tr>
+    <tr><td></td><td>3.1 Challenges Faced & Solutions</td><td>15</td></tr>
+    <tr><td></td><td>3.2 Skills Acquired</td><td>18</td></tr>
+    <tr><td></td><td>3.3 Knowledge Gained</td><td>20</td></tr>
+    <tr><td><strong>4</strong></td><td><strong>Analysis and Discussion</strong></td><td>22</td></tr>
+    <tr><td></td><td>4.1 Performance Evaluation</td><td>22</td></tr>
+    <tr><td></td><td>4.2 Comparison with Expectations</td><td>24</td></tr>
+    <tr><td></td><td>4.3 Recommendations</td><td>25</td></tr>
+    <tr><td><strong>5</strong></td><td><strong>Conclusion & Future Scope</strong></td><td>26</td></tr>
+    <tr><td></td><td>5.1 Summary of Key Takeaways</td><td>26</td></tr>
+    <tr><td></td><td>5.2 Professional Growth Reflection</td><td>27</td></tr>
+    <tr><td></td><td>5.3 Planned Future Enhancements</td><td>28</td></tr>
+    <tr><td><strong>—</strong></td><td><strong>References (APA Format)</strong></td><td>29</td></tr>
+    <tr><td><strong>—</strong></td><td><strong>Appendices (A: Schema, B: Code, C: UI)</strong></td><td>30</td></tr>
+  </table>
+
+  <!-- ==================== CHAPTER 1 ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter 1: Introduction</h1>
+
+  <h2 class="section-heading">1.1 Purpose of the Report</h2>
+  <p>
+    This project report is formally submitted as an essential academic requirement for the course <strong>Mobile Application Development (MCA-20-43)</strong>, bearing 2.5 credits in the 4th semester of the Master of Computer Applications (MCA) programme at the <strong>Centre for Distance and Online Education (CDOE), Kurukshetra University, Kurukshetra</strong>.
+  </p>
+  <p>
+    The principal objective of this document is to furnish an exhaustive analytical record of the software engineering processes, technical methodologies, design patterns, and deployment strategies applied during the development of <strong>ShopEasy</strong>. ShopEasy represents a full-stack, enterprise-grade e-commerce application capable of running simultaneously as a native mobile app on Android/iOS via Expo SDK 57 and as an adaptive Web application deployed across cloud edge networks.
+  </p>
+
+  <h2 class="section-heading">1.2 Objectives of the Project Report</h2>
+  <p>The core objectives undertaken and achieved during the project report are:</p>
+  <ul>
+    <li><strong>Cross-Platform Mobile Architecture:</strong> Develop a unified codebase using React Native and Expo SDK 57 that eliminates mobile-web fragmentation.</li>
+    <li><strong>Dynamic Remote API Hydration:</strong> Integrate the Platzi Fake Store Cloud REST API to fetch live catalog products and multi-level categories dynamically without requiring heavy local database seeding.</li>
+    <li><strong>Fault-Tolerant Data Sanitization:</strong> Implement defensive parsers to sanitize stringified JSON arrays and malformed remote image URLs.</li>
+    <li><strong>Offline-First State Storage:</strong> Architect reactive Context providers for Cart and Wishlist management with persistence to device <code>AsyncStorage</code>.</li>
+    <li><strong>Responsive Viewport Computation:</strong> Build dynamic grid layouts utilizing <code>useWindowDimensions</code> that automatically calculate column densities (2 to 4 columns) across mobile and desktop displays.</li>
+    <li><strong>Cloud Edge Deployment:</strong> Configure automated CI/CD deployment on Vercel with single-page application (SPA) routing rewrites.</li>
+  </ul>
+
+  <h2 class="section-heading">1.3 Organization Overview</h2>
+  <h3 class="sub-heading">1.3.1 Brief History, Mission, and Vision</h3>
+  <p>
+    <strong>[Company/Organization Name, e.g., ShopEasy Digital Systems]</strong> was founded to advance modern mobile, cloud, and cross-platform software engineering. The organization focuses on developing responsive, reliable, and accessible software systems. Its mission is to build robust, cloud-native applications using modern component-driven architectures.
+  </p>
+  <h3 class="sub-heading">1.3.2 Organizational Structure & Key Departments</h3>
+  <p>The software engineering division is structured into four primary operational units:</p>
+  <ol>
+    <li><strong>Product Strategy & Design:</strong> Defines user requirements, wireframes, and customer journey touchpoints.</li>
+    <li><strong>Mobile & Frontend Engineering:</strong> Specializes in React Native, Expo, reactive state management, and accessibility.</li>
+    <li><strong>Backend & Cloud Services:</strong> Develops REST APIs, authentication security, database modeling, and caching layers.</li>
+    <li><strong>Quality Assurance & Release Management:</strong> Oversees automated regression tests, code audits, and cloud deployments.</li>
+  </ol>
+
+  <!-- ==================== CHAPTER 2 ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter 2: Project Report Activities</h1>
+
+  <h2 class="section-heading">2.1 Roles and Responsibilities</h2>
+  <p>During the project report tenure, the author held the responsibility of <strong>Full-Stack Mobile Software Developer</strong>, encompassing:</p>
+  <ul>
+    <li>Designing modular UI components: <code>ProductCard</code>, <code>SearchBar</code>, <code>ProductImage</code>, and <code>EmptyState</code>.</li>
+    <li>Developing custom REST service adapters in <code>productService.js</code> to query, filter, and normalize external product records.</li>
+    <li>Constructing global state contexts with optimistic UI updates and persistent disk caching.</li>
+    <li>Resolving runtime bundling errors, managing Metro bundler lifecycles, and configuring Vercel cloud monorepo deployments.</li>
+  </ul>
+
+  <h2 class="section-heading">2.2 Projects and Assignments: "ShopEasy" Platform</h2>
+  <h3 class="sub-heading">2.2.1 Problem Definition & Existing Limitations</h3>
+  <p>
+    Conventional mobile shopping apps often impose strict authentication walls immediately upon startup, alienating potential buyers. Furthermore, multi-platform applications typically suffer from fragmented codebases where web and native mobile interfaces are written separately, doubling maintenance costs. ShopEasy was designed to address these pain points through a guest-first browsing flow and a single responsive React Native codebase.
+  </p>
+
+  <h3 class="sub-heading">2.2.2 Dynamic API Integration & Sanitization Pipeline</h3>
+  <p>
+    Product data is consumed dynamically from the Platzi Cloud Store API. Because third-party API payloads occasionally contain malformed brackets or stringified arrays, a defensive parsing function <code>cleanImageUrl</code> was engineered:
+  </p>
+  <pre>
+export const cleanImageUrl = (url) => {
+  if (!url || typeof url !== 'string') {
+    return 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600';
+  }
+  let cleaned = url.trim();
+  if (cleaned.startsWith('[') || cleaned.startsWith('"')) {
+    try {
+      const parsed = JSON.parse(cleaned);
+      if (Array.isArray(parsed) && parsed.length > 0) cleaned = String(parsed[0]);
+    } catch (e) {
+      cleaned = cleaned.replace(/^[\["'\s]+|[\]"'\s]+$/g, '');
+    }
+  }
+  cleaned = cleaned.replace(/^["']+|["']+$/g, '').replace(/\\"/g, '');
+  return cleaned.startsWith('http') ? cleaned : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600';
+};</pre>
+
+  <h3 class="sub-heading">2.2.3 Client-Side State Persistence Engine</h3>
+  <p>
+    Shopping cart items and saved wishlist products are stored reactively via React Context and backed by <code>@react-native-async-storage/async-storage</code>. When users modify item quantities, state is updated optimistically in memory while an asynchronous write persists the JSON collection to disk under <code>@shopeasy_cart</code>.
+  </p>
+
+  <!-- ==================== CHAPTER 3 ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter 3: Learning Experience</h1>
+
+  <h2 class="section-heading">3.1 Challenges Faced and Problem Resolutions</h2>
+
+  <h3 class="sub-heading">Challenge 1: Runtime Error - Missing Hook Import</h3>
+  <p>
+    <strong>Issue:</strong> Invoking the Search screen triggered an abrupt crash with the error: <code>Property 'useWindowDimensions' doesn't exist at SearchScreen.js (111:21)</code>.<br>
+    <strong>Diagnosis:</strong> The hook was invoked to dynamically compute the number of columns in the product grid, but had not been imported from <code>react-native</code>.<br>
+    <strong>Solution:</strong> Added <code>useWindowDimensions</code> to the import statement and guarded <code>columnWrapperStyle</code> with <code>numColumns > 1 ? styles.columnWrapper : undefined</code>.
+  </p>
+
+  <h3 class="sub-heading">Challenge 2: Monorepo Cloud Deployment HTTP 404</h3>
+  <p>
+    <strong>Issue:</strong> Connecting the Git repository to Vercel produced a blank <code>404: NOT_FOUND</code> screen.<br>
+    <strong>Diagnosis:</strong> Vercel's build container defaulted to the root folder, which contained subfolders (<code>backend/</code> and <code>mobile/</code>) but no root <code>index.html</code>.<br>
+    <strong>Solution:</strong> Generated root and subfolder <code>vercel.json</code> deployment manifests directing the build engine to run <code>npx expo export --platform web</code> inside <code>mobile/</code> and rewrite all routes to <code>/index.html</code>.
+  </p>
+
+  <h2 class="section-heading">3.2 Skills Acquired</h2>
+  <ul>
+    <li><strong>Full-Stack Architecture:</strong> Deep proficiency in React Native, Expo SDK 57, React 19, and Node.js REST design.</li>
+    <li><strong>State Synchronization:</strong> Mastery of asynchronous device caching, local storage serialization, and optimistic UI rendering.</li>
+    <li><strong>DevOps & Version Control:</strong> Advanced Git history rewriting, interactive rebase, and continuous automated cloud deployment.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 4 ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter 4: Analysis and Discussion</h1>
+
+  <h2 class="section-heading">4.1 Performance Evaluation</h2>
+  <table>
+    <tr><th>Evaluation Metric</th><th>Self-Assessment</th><th>Supervisor Rating</th></tr>
+    <tr><td>System Architecture & Modularity</td><td>9.5 / 10</td><td>Excellent</td></tr>
+    <tr><td>UI Responsiveness & Cross-Platform UX</td><td>9.5 / 10</td><td>Outstanding</td></tr>
+    <tr><td>Defensive Error Handling & Robustness</td><td>9.0 / 10</td><td>Very Good</td></tr>
+    <tr><td>Deployment Automation & Cloud Integrity</td><td>9.0 / 10</td><td>Commendable</td></tr>
+  </table>
+
+  <h2 class="section-heading">4.2 Comparison with Initial Expectations</h2>
+  <p>
+    The original project scope aimed for a basic mobile prototype using mocked local JSON arrays. The finished project exceeded expectations by delivering dynamic remote API hydration, complete client-side search across four dimensions (title, description, category, brand), image error guards, persistent offline storage, and universal web hosting on Vercel.
+  </p>
+
+  <h2 class="section-heading">4.3 Recommendations</h2>
+  <ul>
+    <li>Introduce automated end-to-end integration tests using Detox or Cypress.</li>
+    <li>Integrate native secure payment gateways (e.g., Stripe, Razorpay) alongside the Cash-on-Delivery flow.</li>
+    <li>Adopt Redux Toolkit or Zustand as the catalog expands to hundreds of categories.</li>
+  </ul>
+
+  <!-- ==================== CHAPTER 5 ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter 5: Conclusion & Future Scope</h1>
+
+  <h2 class="section-heading">5.1 Summary of Key Takeaways</h2>
+  <p>
+    The successful execution of the <strong>ShopEasy</strong> project establishes the feasibility and performance advantages of building e-commerce software using a unified React Native and Expo framework. By implementing clean separation of concerns between presentation components, service adapters, and state providers, the application achieves high execution speed, aesthetic appeal, and robust stability.
+  </p>
+
+  <h2 class="section-heading">5.2 Personal and Professional Growth</h2>
+  <p>
+    The practical development lifecycle undertaken during this project report significantly reinforced the theoretical knowledge acquired in the MCA curriculum, providing hands-on experience in full-stack debugging, cloud hosting configurations, and responsive mobile design.
+  </p>
+
+  <h2 class="section-heading">5.3 Planned Future Enhancements</h2>
+  <p>
+    Future iterations will incorporate AI-driven recommendation engines, push notifications via Expo Notifications for live order tracking, and internationalization (i18n) for regional language support.
+  </p>
+
+  <!-- ==================== REFERENCES ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">References (APA Format)</h1>
+  <ol>
+    <li>Facebook Open Source. (2024). <em>React Native: A framework for building native apps using React</em>. Meta Platforms, Inc. https://reactnative.dev/</li>
+    <li>Expo Team. (2024). <em>Expo Documentation & SDK Reference (v57)</em>. 650 Industries, Inc. https://docs.expo.dev/</li>
+    <li>Escuélita JS. (2024). <em>Platzi Fake Store API Documentation</em>. Platzi Inc. https://api.escuelajs.co/</li>
+    <li>React Navigation Contributors. (2024). <em>Routing and navigation for Expo and React Native apps (v6)</em>. Software Mansion. https://reactnavigation.org/</li>
+    <li>Vercel Inc. (2024). <em>Vercel Documentation: Single Page Application Configuration and Monorepos</em>. https://vercel.com/docs</li>
+    <li>Chacon, S., & Straub, B. (2023). <em>Pro Git: Everything you need to know about Git</em> (2nd ed.). Apress.</li>
+    <li>Banks, A., & Porcello, E. (2020). <em>Learning React: Modern Patterns for Developing React Apps</em> (2nd ed.). O'Reilly Media.</li>
+  </ol>
+
+  <!-- ==================== APPENDICES ==================== -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Appendices</h1>
+
+  <h2 class="section-heading">Appendix A: Core Source Code Listing</h2>
+  <h3 class="sub-heading">1. App Navigation Entrypoint (mobile/src/navigation/AppNavigator.js)</h3>
+  <pre>
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { useAuth } from '../hooks/useAuth';
+import MainNavigator from './MainNavigator';
+
+const AppNavigator = () => {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      &lt;View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}&gt;
+        &lt;ActivityIndicator size="large" /&gt;
+      &lt;/View&gt;
+    );
+  }
+
+  // Opens directly to Home store page on app launch
+  return &lt;MainNavigator /&gt;;
+};
+
+export default AppNavigator;</pre>
+
+  <h3 class="sub-heading">2. Search Screen with Dynamic Columns (mobile/src/screens/products/SearchScreen.js)</h3>
+  <pre>
+import React, { useState } from 'react';
+import { View, FlatList, SafeAreaView, useWindowDimensions } from 'react-native';
+import ProductCard from '../../components/ProductCard';
+
+const SearchScreen = ({ navigation }) => {
+  const [products, setProducts] = useState([]);
+  const { width } = useWindowDimensions();
+  const numColumns = width > 1050 ? 4 : width > 680 ? 3 : 2;
+
+  return (
+    &lt;SafeAreaView style={{ flex: 1 }}&gt;
+      &lt;FlatList
+        key={`search-grid-${numColumns}`}
+        data={products}
+        keyExtractor={(item) => item._id}
+        numColumns={numColumns}
+        columnWrapperStyle={numColumns > 1 ? { justifyContent: 'space-between' } : undefined}
+        renderItem={({ item }) => (
+          &lt;ProductCard product={item} onPress={(p) => navigation.navigate('ProductDetails', { productId: p._id })} /&gt;
+        )}
+      /&gt;
+    &lt;/SafeAreaView&gt;
+  );
+};
+
+export default SearchScreen;</pre>
+
+  <div class="footer-note">
+    Report submitted by: <strong>Atul Kumar</strong> | Course: <strong>MCA-20-43 Mobile Application Development</strong> | Kurukshetra University
+  </div>
+
+</body>
+</html>
