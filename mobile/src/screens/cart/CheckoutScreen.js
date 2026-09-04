@@ -13,6 +13,7 @@ import colors from '../../constants/colors';
 import sizes from '../../constants/sizes';
 import CustomButton from '../../components/CustomButton';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import EmptyState from '../../components/EmptyState';
 import { formatPrice } from '../../utils/priceCalculator';
 import { useCart } from '../../hooks/useCart';
 import { useAuth } from '../../hooks/useAuth';
@@ -89,6 +90,31 @@ const CheckoutScreen = ({ navigation }) => {
       setSubmitting(false);
     }
   };
+
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={styles.backBtn}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Checkout</Text>
+          <View style={{ width: 24 }} />
+        </View>
+        <EmptyState
+          icon="log-in-outline"
+          title="Sign In to Checkout"
+          description="Please sign in or create an account to select your delivery address and complete your purchase."
+          buttonTitle="Sign In / Register"
+          onButtonPress={() => navigation.navigate('Login')}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>

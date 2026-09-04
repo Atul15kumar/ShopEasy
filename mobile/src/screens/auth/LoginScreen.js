@@ -41,21 +41,15 @@ const LoginScreen = ({ navigation }) => {
 
     try {
       await login(email.trim(), password);
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('TabRoot');
+      }
     } catch (error) {
       Alert.alert('Login Failed', error.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Quick fill helper for testers
-  const fillDemo = (role) => {
-    if (role === 'admin') {
-      setEmail('admin@shopeasy.com');
-      setPassword('AdminPassword123!');
-    } else {
-      setEmail('alex@shopeasy.com');
-      setPassword('UserPassword123!');
     }
   };
 
@@ -65,6 +59,21 @@ const LoginScreen = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <ScrollView contentContainerStyle={screenStyles.authContainer} keyboardShouldPersistTaps="handled">
+        {/* Close Button to return to store */}
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('TabRoot');
+            }
+          }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={26} color={colors.text} />
+        </TouchableOpacity>
+
         {/* Header Branding */}
         <View style={screenStyles.authHeader}>
           <View style={screenStyles.authLogoContainer}>
@@ -113,10 +122,7 @@ const LoginScreen = ({ navigation }) => {
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry={!showPassword}
               />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
                   name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                   size={18}
@@ -134,19 +140,6 @@ const LoginScreen = ({ navigation }) => {
             loading={loading}
             style={{ marginTop: sizes.base }}
           />
-
-          {/* Quick Demo Credentials helper */}
-          <View style={styles.demoSection}>
-            <Text style={styles.demoTitle}>Quick Demo Sign In:</Text>
-            <View style={styles.demoButtonsRow}>
-              <TouchableOpacity style={styles.demoBtn} onPress={() => fillDemo('user')}>
-                <Text style={styles.demoBtnText}>Customer</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.demoBtn} onPress={() => fillDemo('admin')}>
-                <Text style={styles.demoBtnText}>Admin</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
 
         {/* Footer Link */}
@@ -199,32 +192,12 @@ const styles = StyleSheet.create({
     fontSize: sizes.fontXs,
     marginTop: 4,
   },
-  demoSection: {
-    marginTop: sizes.lg,
-    paddingTop: sizes.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    alignItems: 'center',
-  },
-  demoTitle: {
-    fontSize: sizes.fontXs,
-    color: colors.textSecondary,
+  closeBtn: {
+    alignSelf: 'flex-start',
+    padding: sizes.xs,
     marginBottom: sizes.sm,
-  },
-  demoButtonsRow: {
-    flexDirection: 'row',
-    gap: sizes.sm,
-  },
-  demoBtn: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: sizes.md,
-    paddingVertical: sizes.xs,
-    borderRadius: sizes.radiusSm,
-  },
-  demoBtnText: {
-    color: colors.primary,
-    fontSize: sizes.fontXs,
-    fontWeight: '700',
+    backgroundColor: colors.surface,
+    borderRadius: sizes.radiusFull,
   },
 });
 

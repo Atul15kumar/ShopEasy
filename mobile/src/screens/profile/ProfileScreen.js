@@ -59,23 +59,44 @@ const ProfileScreen = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Profile Header Card */}
         <View style={styles.headerCard}>
-          <View style={styles.avatarWrapper}>
-            <ProductImage
-              uri={user?.profileImage}
-              style={styles.avatar}
-            />
-          </View>
-          <Text style={styles.userName}>{user?.name || 'Customer'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'customer@shopeasy.com'}</Text>
-          {user?.phone ? <Text style={styles.userPhone}>{user.phone}</Text> : null}
+          {user ? (
+            <>
+              <View style={styles.avatarWrapper}>
+                <ProductImage
+                  uri={user?.profileImage}
+                  style={styles.avatar}
+                />
+              </View>
+              <Text style={styles.userName}>{user?.name || 'Customer'}</Text>
+              <Text style={styles.userEmail}>{user?.email || 'customer@shopeasy.com'}</Text>
+              {user?.phone ? <Text style={styles.userPhone}>{user.phone}</Text> : null}
 
-          <TouchableOpacity
-            style={styles.editProfileChip}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Ionicons name="pencil" size={12} color={colors.primary} style={{ marginRight: 4 }} />
-            <Text style={styles.editProfileChipText}>Edit Profile</Text>
-          </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.editProfileChip}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Ionicons name="pencil" size={12} color={colors.primary} style={{ marginRight: 4 }} />
+                <Text style={styles.editProfileChipText}>Edit Profile</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <View style={styles.guestCard}>
+              <View style={styles.guestIconCircle}>
+                <Ionicons name="person-outline" size={38} color={colors.primary} />
+              </View>
+              <Text style={styles.userName}>Welcome to ShopEasy</Text>
+              <Text style={styles.guestSubtitle}>
+                Sign in to view your order history, delivery addresses, and account details.
+              </Text>
+              <TouchableOpacity
+                style={styles.signInBtn}
+                onPress={() => navigation.navigate('Login')}
+              >
+                <Text style={styles.signInBtnText}>Sign In / Register</Text>
+                <Ionicons name="arrow-forward" size={16} color={colors.white} style={{ marginLeft: 6 }} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Account Menu Section */}
@@ -87,7 +108,7 @@ const ProfileScreen = ({ navigation }) => {
               icon="receipt-outline"
               title="My Orders"
               subtitle="View all past and active orders"
-              onPress={() => navigation.navigate('Orders')}
+              onPress={() => (user ? navigation.navigate('Orders') : navigation.navigate('Login'))}
             />
             <View style={styles.divider} />
 
@@ -103,7 +124,7 @@ const ProfileScreen = ({ navigation }) => {
               icon="location-outline"
               title="Delivery Addresses"
               subtitle="Manage shipping locations"
-              onPress={() => navigation.navigate('AddressScreen')}
+              onPress={() => (user ? navigation.navigate('AddressScreen') : navigation.navigate('Login'))}
             />
           </View>
         </View>
@@ -134,12 +155,21 @@ const ProfileScreen = ({ navigation }) => {
             />
             <View style={styles.divider} />
 
-            <ProfileMenuItem
-              icon="log-out-outline"
-              title="Log Out"
-              onPress={handleLogout}
-              isDestructive
-            />
+            {user ? (
+              <ProfileMenuItem
+                icon="log-out-outline"
+                title="Log Out"
+                onPress={handleLogout}
+                isDestructive
+              />
+            ) : (
+              <ProfileMenuItem
+                icon="log-in-outline"
+                title="Sign In"
+                subtitle="Sign in to your ShopEasy account"
+                onPress={() => navigation.navigate('Login')}
+              />
+            )}
           </View>
         </View>
 
@@ -258,6 +288,42 @@ const styles = StyleSheet.create({
     fontSize: sizes.fontXs,
     color: colors.textMuted,
     marginVertical: sizes.xl,
+  },
+  guestCard: {
+    alignItems: 'center',
+    paddingHorizontal: sizes.lg,
+    paddingVertical: sizes.md,
+  },
+  guestIconCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: sizes.sm,
+  },
+  guestSubtitle: {
+    fontSize: sizes.fontSm,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    marginTop: 4,
+    marginBottom: sizes.md,
+    lineHeight: 20,
+    maxWidth: 280,
+  },
+  signInBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: sizes.lg,
+    borderRadius: sizes.radiusFull,
+  },
+  signInBtnText: {
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: sizes.fontSm,
   },
 });
 

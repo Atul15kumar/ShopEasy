@@ -11,6 +11,8 @@ import OrderSuccessScreen from '../screens/orders/OrderSuccessScreen';
 import EditProfileScreen from '../screens/profile/EditProfileScreen';
 import AddressScreen from '../screens/profile/AddressScreen';
 import SettingsScreen from '../screens/profile/SettingsScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,6 +40,8 @@ const MainNavigator = () => {
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="AddressScreen" component={AddressScreen} />
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
     </Stack.Navigator>
   );
 };

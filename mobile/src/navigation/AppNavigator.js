@@ -20,13 +20,13 @@ const SplashScreen = () => (
 );
 
 const AppNavigator = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return <SplashScreen />;
   }
 
-  return isAuthenticated ? <MainNavigator /> : <AuthNavigator />;
+  return <MainNavigator />;
 };
 
 const styles = StyleSheet.create({

@@ -63,6 +63,11 @@ const RegisterScreen = ({ navigation }) => {
         password,
         confirmPassword,
       });
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('TabRoot');
+      }
     } catch (error) {
       Alert.alert('Registration Failed', error.message || 'Could not register. Please try again.');
     } finally {
@@ -76,6 +81,21 @@ const RegisterScreen = ({ navigation }) => {
       style={{ flex: 1, backgroundColor: colors.background }}
     >
       <ScrollView contentContainerStyle={screenStyles.authContainer} keyboardShouldPersistTaps="handled">
+        {/* Close Button */}
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('TabRoot');
+            }
+          }}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="close" size={26} color={colors.text} />
+        </TouchableOpacity>
+
         {/* Header */}
         <View style={screenStyles.authHeader}>
           <View style={screenStyles.authLogoContainer}>
@@ -255,6 +275,13 @@ const styles = StyleSheet.create({
     color: colors.danger,
     fontSize: sizes.fontXs,
     marginTop: 4,
+  },
+  closeBtn: {
+    alignSelf: 'flex-start',
+    padding: sizes.xs,
+    marginBottom: sizes.sm,
+    backgroundColor: colors.surface,
+    borderRadius: sizes.radiusFull,
   },
 });
 
