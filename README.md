@@ -187,40 +187,6 @@ ShopEasy/
 
 ---
 
-## ⚙️ Environment Setup
-
-### 1. MongoDB Setup
-You can use either a **Local MongoDB instance** or **MongoDB Atlas Cloud**:
-
-* **Option A: MongoDB Atlas (Recommended)**
-  1. Sign in to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-  2. Create a free M0 cluster.
-  3. Under **Database Access**, create a user (e.g. `shopeasy_user` / `password123`).
-  4. Under **Network Access**, add IP `0.0.0.0/0` (allow from anywhere).
-  5. Copy your connection URI into `backend/.env`:
-     ```env
-     MONGO_URI=mongodb+srv://shopeasy_user:password123@cluster0.abcde.mongodb.net/shopeasy?retryWrites=true&w=majority
-     ```
-
-* **Option B: Local MongoDB**
-  Ensure MongoDB service is running locally on port 27017:
-  ```env
-  MONGO_URI=mongodb://127.0.0.1:27017/shopeasy
-  ```
-
-### 2. Cloudinary Setup
-1. Create a free account at [Cloudinary.com](https://cloudinary.com/).
-2. Copy your **Cloud Name**, **API Key**, and **API Secret** from the Cloudinary Console Dashboard.
-3. Add them to `backend/.env`:
-   ```env
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   ```
-   *(Note: If Cloudinary credentials are left empty during initial testing, the backend will safely fallback to high-resolution product images without crashing).*
-
----
-
 ## 🖥️ Backend Installation & Running
 
 1. Open terminal and navigate to `backend`:
