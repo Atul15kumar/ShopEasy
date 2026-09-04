@@ -1,0 +1,355 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import colors from '../../constants/colors';
+import sizes from '../../constants/sizes';
+import screenStyles from '../../styles/screenStyles';
+import SearchBar from '../../components/SearchBar';
+import CategoryCard from '../../components/CategoryCard';
+import ProductCard from '../../components/ProductCard';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import { fetchProducts, fetchCategories } from '../../services/productService';
+import { useCart } from '../../hooks/useCart';
+
+const HomeScreen = ({ navigation }) => {
+  const { cartCount } = useCart();
+
+  const [categories, setCategories] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [popularProducts, setPopularProducts] = useState([]);
+  const [newArrivals, setNewArrivals] = useState([]);
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadHomeData = async () => {
+    try {
+      const [catRes, featRes, popRes, newRes, bestRes] = await Promise.all([
+        fetchCategories(),
+        fetchProducts({ featured: 'true', limit: 6 }),
+        fetchProducts({ popular: 'true', limit: 6 }),
+        fetchProducts({ newArrival: 'true', limit: 6 }),
+        fetchProducts({ bestSeller: 'true', limit: 6 }),
+      ]);
+
+      if (catRes?.data?.categories) setCategories(catRes.data.categories);
+      if (featRes?.data?.products) setFeaturedProducts(featRes.data.products);
+      if (popRes?.data?.products) setPopularProducts(popRes.data.products);
+      if (newRes?.data?.products) setNewArrivals(newRes.data.products);
+      if (bestRes?.data?.products) setBestSellers(bestRes.data.products);
+    } catch (error) {
+      console.warn('Error loading home data:', error.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadHomeData();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadHomeData();
+  }, []);
+
+  const handleProductPress = (product) => {
+    navigation.navigate('ProductDetails', { productId: product._id });
+  };
+
+  const handleCategoryPress = (category) => {
+    navigation.navigate('ProductList', {
+      categoryId: category._id,
+      categoryName: category.name,
+    });
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      {/* Top App Bar */}
+      <View style={styles.headerBar}>
+        <View style={styles.brandRow}>
+          <View style={styles.logoBadge}>
+            <Ionicons name="bag-handle" size={20} color={colors.white} />
+          </View>
+          <Text style={styles.brandTitle}>ShopEasy</Text>
+        </View>
+
+        <View style={styles.headerIconsRow}>
+          {/* Notification Button */}
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => Alert.alert('Notifications', 'You have no new notifications.')}
+          >
+            <Ionicons name="notifications-outline" size={22} color={colors.text} />
+          </TouchableOpacity>
+
+          {/* Cart with Live Badge */}
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={() => navigation.navigate('Cart')}
+          >
+            <Ionicons name="cart-outline" size={24} color={colors.text} />
+            {cartCount > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cartCount > 99 ? '99+' : cartCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Search Input (Tapping opens dedicated search & filters) */}
+      <View style={styles.searchWrapper}>
+        <SearchBar
+          editable={false}
+          onPress={() => navigation.navigate('Search')}
+          placeholder="Search items, brands, categories..."
+        />
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
+        style={{ flex: 1, backgroundColor: colors.background }}
+      >
+        {/* Promotional Hero Banner */}
+        <View style={screenStyles.bannerContainer}>
+          <Text style={screenStyles.bannerTitle}>Super Autumn Sale</Text>
+          <Text style={screenStyles.bannerSubtitle}>Up to 40% OFF on premium gadgets & lifestyle essentials</Text>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('ProductList', { isFeatured: true })}
+            style={styles.bannerBtn}
+          >
+            <Text style={styles.bannerBtnText}>Shop Deals</Text>
+            <Ionicons name="arrow-forward" size={14} color={colors.primary} style={{ marginLeft: 4 }} />
+          </TouchableOpacity>
+        </View>
+
+        {loading ? (
+          <LoadingSpinner message="Fetching latest deals..." />
+        ) : (
+          <>
+            {/* Categories Section */}
+            {categories.length > 0 && (
+              <View style={styles.section}>
+                <View style={screenStyles.sectionHeader}>
+                  <Text style={styles.sectionHeading}>Categories</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Categories')}>
+                    <Text style={screenStyles.seeAllText}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.horizontalListContent}
+                >
+                  {categories.map((cat) => (
+                    <CategoryCard
+                      key={cat._id}
+                      category={cat}
+                      layout="horizontal"
+                      onPress={handleCategoryPress}
+                    />
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
+            {/* Featured Products */}
+            {featuredProducts.length > 0 && (
+              <View style={styles.section}>
+                <View style={screenStyles.sectionHeader}>
+                  <Text style={styles.sectionHeading}>Featured Products</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ProductList', { filterType: 'featured', title: 'Featured Products' })}
+                  >
+                    <Text style={screenStyles.seeAllText}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productGrid}>
+                  {featuredProducts.map((prod) => (
+                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Popular Products */}
+            {popularProducts.length > 0 && (
+              <View style={styles.section}>
+                <View style={screenStyles.sectionHeader}>
+                  <Text style={styles.sectionHeading}>Trending Now</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ProductList', { filterType: 'popular', title: 'Trending Products' })}
+                  >
+                    <Text style={screenStyles.seeAllText}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productGrid}>
+                  {popularProducts.map((prod) => (
+                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* New Arrivals */}
+            {newArrivals.length > 0 && (
+              <View style={styles.section}>
+                <View style={screenStyles.sectionHeader}>
+                  <Text style={styles.sectionHeading}>New Arrivals</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ProductList', { filterType: 'newArrival', title: 'New Arrivals' })}
+                  >
+                    <Text style={screenStyles.seeAllText}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productGrid}>
+                  {newArrivals.map((prod) => (
+                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Best Sellers */}
+            {bestSellers.length > 0 && (
+              <View style={styles.section}>
+                <View style={screenStyles.sectionHeader}>
+                  <Text style={styles.sectionHeading}>Best Sellers</Text>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ProductList', { filterType: 'bestSeller', title: 'Best Sellers' })}
+                  >
+                    <Text style={screenStyles.seeAllText}>See All</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productGrid}>
+                  {bestSellers.map((prod) => (
+                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
+                  ))}
+                </View>
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  headerBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: sizes.base,
+    paddingTop: sizes.sm,
+    paddingBottom: sizes.sm,
+    backgroundColor: colors.surface,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: sizes.sm,
+  },
+  brandTitle: {
+    fontSize: sizes.fontXl,
+    fontWeight: '800',
+    color: colors.text,
+    letterSpacing: -0.5,
+  },
+  headerIconsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: sizes.sm,
+  },
+  iconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: colors.badge,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: colors.surface,
+  },
+  badgeText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  searchWrapper: {
+    paddingHorizontal: sizes.base,
+    paddingBottom: sizes.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  bannerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    paddingHorizontal: sizes.md,
+    paddingVertical: sizes.sm,
+    borderRadius: sizes.radiusMd,
+    alignSelf: 'flex-start',
+  },
+  bannerBtnText: {
+    color: colors.primary,
+    fontSize: sizes.fontSm,
+    fontWeight: '700',
+  },
+  section: {
+    marginBottom: sizes.sm,
+  },
+  sectionHeading: {
+    fontSize: sizes.fontLg,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  horizontalListContent: {
+    paddingHorizontal: sizes.base,
+  },
+  productGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: sizes.base,
+  },
+});
+
+export default HomeScreen;
