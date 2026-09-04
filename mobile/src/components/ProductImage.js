@@ -5,7 +5,7 @@ import colors from '../constants/colors';
 
 const fallbackImage = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80';
 
-const ProductImage = ({ uri, style, resizeMode = 'cover' }) => {
+const ProductImage = ({ uri, style, resizeMode = 'contain' }) => {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -15,7 +15,7 @@ const ProductImage = ({ uri, style, resizeMode = 'cover' }) => {
     <View style={[styles.container, style]}>
       <Image
         source={imageSource}
-        style={[StyleSheet.absoluteFill, style]}
+        style={[styles.image]}
         resizeMode={resizeMode}
         onLoadStart={() => setIsLoading(true)}
         onLoadEnd={() => setIsLoading(false)}
@@ -41,17 +41,25 @@ const ProductImage = ({ uri, style, resizeMode = 'cover' }) => {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
   },
   loaderContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: '#F8FAFC',
   },
   errorContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: '#F8FAFC',
   },
 });
 

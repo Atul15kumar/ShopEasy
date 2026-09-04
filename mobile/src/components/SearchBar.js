@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../constants/colors';
 import sizes from '../constants/sizes';
@@ -13,14 +13,43 @@ const SearchBar = ({
   editable = true,
   onPress,
   style,
+  autoFocus = false,
 }) => {
+  // If not editable (e.g. on HomeScreen), render a clean tappable button that reliably opens Search
+  if (!editable) {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={onPress}
+        style={[styles.container, style]}
+      >
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color={colors.textSecondary}
+          style={styles.searchIcon}
+        />
+        <View style={styles.placeholderContainer}>
+          <Text style={styles.placeholderText}>{placeholder}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  // Editable search bar for dedicated SearchScreen
   return (
-    <TouchableOpacity
-      activeOpacity={editable ? 1 : 0.8}
-      onPress={onPress}
-      style={[styles.container, style]}
-    >
-      <Ionicons name="search-outline" size={20} color={colors.textSecondary} style={styles.searchIcon} />
+    <View style={[styles.container, style]}>
+      <TouchableOpacity
+        onPress={onSubmitEditing}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color={colors.primary}
+          style={styles.searchIcon}
+        />
+      </TouchableOpacity>
       <TextInput
         style={styles.input}
         value={value}
@@ -28,15 +57,21 @@ const SearchBar = ({
         onSubmitEditing={onSubmitEditing}
         placeholder={placeholder}
         placeholderTextColor={colors.textMuted}
-        editable={editable}
+        editable={true}
         returnKeyType="search"
+        autoFocus={autoFocus}
+        autoCapitalize="none"
+        autoCorrect={false}
       />
       {value && value.length > 0 && onClear ? (
-        <TouchableOpacity onPress={onClear} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity
+          onPress={onClear}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
         </TouchableOpacity>
       ) : null}
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -54,11 +89,20 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: sizes.sm,
   },
+  placeholderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  placeholderText: {
+    fontSize: sizes.fontBase,
+    color: colors.textMuted,
+  },
   input: {
     flex: 1,
     fontSize: sizes.fontBase,
     color: colors.text,
     paddingVertical: 0,
+    outlineStyle: 'none',
   },
 });
 

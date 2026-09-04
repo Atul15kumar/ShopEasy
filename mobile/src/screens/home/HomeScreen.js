@@ -3,12 +3,12 @@ import {
   View,
   Text,
   ScrollView,
-  FlatList,
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
   StyleSheet,
   Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../constants/colors';
@@ -23,6 +23,14 @@ import { useCart } from '../../hooks/useCart';
 
 const HomeScreen = ({ navigation }) => {
   const { cartCount } = useCart();
+  const { width } = useWindowDimensions();
+
+  // Responsive column count and card sizing
+  const containerWidth = Math.min(width, 1200);
+  const cols = containerWidth > 1050 ? 4 : containerWidth > 680 ? 3 : 2;
+  const gap = 12;
+  const padding = sizes.base * 2;
+  const cardWidth = Math.floor((containerWidth - padding - gap * (cols - 1)) / cols);
 
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -36,10 +44,10 @@ const HomeScreen = ({ navigation }) => {
     try {
       const [catRes, featRes, popRes, newRes, bestRes] = await Promise.all([
         fetchCategories(),
-        fetchProducts({ featured: 'true', limit: 6 }),
-        fetchProducts({ popular: 'true', limit: 6 }),
-        fetchProducts({ newArrival: 'true', limit: 6 }),
-        fetchProducts({ bestSeller: 'true', limit: 6 }),
+        fetchProducts({ featured: 'true', limit: 8 }),
+        fetchProducts({ popular: 'true', limit: 8 }),
+        fetchProducts({ newArrival: 'true', limit: 8 }),
+        fetchProducts({ bestSeller: 'true', limit: 8 }),
       ]);
 
       if (catRes?.data?.categories) setCategories(catRes.data.categories);
@@ -77,180 +85,230 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      {/* Top App Bar */}
-      <View style={styles.headerBar}>
-        <View style={styles.brandRow}>
-          <View style={styles.logoBadge}>
-            <Ionicons name="bag-handle" size={20} color={colors.white} />
+      <View style={styles.outerContainer}>
+        {/* Top App Bar */}
+        <View style={styles.headerBar}>
+          <View style={styles.brandRow}>
+            <View style={styles.logoBadge}>
+              <Ionicons name="bag-handle" size={20} color={colors.white} />
+            </View>
+            <Text style={styles.brandTitle}>ShopEasy</Text>
           </View>
-          <Text style={styles.brandTitle}>ShopEasy</Text>
+
+          <View style={styles.headerIconsRow}>
+            {/* Notification Button */}
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => Alert.alert('Notifications', 'You have no new notifications.')}
+            >
+              <Ionicons name="notifications-outline" size={22} color={colors.text} />
+            </TouchableOpacity>
+
+            {/* Cart with Live Badge */}
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => navigation.navigate('Cart')}
+            >
+              <Ionicons name="cart-outline" size={24} color={colors.text} />
+              {cartCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{cartCount > 99 ? '99+' : cartCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.headerIconsRow}>
-          {/* Notification Button */}
-          <TouchableOpacity
-            style={styles.iconBtn}
-            onPress={() => Alert.alert('Notifications', 'You have no new notifications.')}
-          >
-            <Ionicons name="notifications-outline" size={22} color={colors.text} />
-          </TouchableOpacity>
-
-          {/* Cart with Live Badge */}
-          <TouchableOpacity
-            style={styles.iconBtn}
-            onPress={() => navigation.navigate('Cart')}
-          >
-            <Ionicons name="cart-outline" size={24} color={colors.text} />
-            {cartCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{cartCount > 99 ? '99+' : cartCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+        {/* Search Input */}
+        <View style={styles.searchWrapper}>
+          <SearchBar
+            editable={false}
+            onPress={() => navigation.navigate('Search')}
+            placeholder="Search items, brands, categories..."
+          />
         </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />
+          }
+          style={{ flex: 1, backgroundColor: colors.background }}
+        >
+          {/* Promotional Hero Banner */}
+          <View style={styles.bannerContainer}>
+            <Text style={styles.bannerTitle}>Super Autumn Sale</Text>
+            <Text style={styles.bannerSubtitle}>Up to 40% OFF on premium gadgets & lifestyle essentials</Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('ProductList', { isFeatured: true })}
+              style={styles.bannerBtn}
+            >
+              <Text style={styles.bannerBtnText}>Shop Deals</Text>
+              <Ionicons name="arrow-forward" size={14} color={colors.primary} style={{ marginLeft: 4 }} />
+            </TouchableOpacity>
+          </View>
+
+          {loading ? (
+            <LoadingSpinner message="Fetching latest deals..." />
+          ) : (
+            <>
+              {/* Categories Section */}
+              {categories.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeading}>Categories</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Categories')}>
+                      <Text style={styles.seeAllText}>See All</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.horizontalListContent}
+                  >
+                    {categories.map((cat) => (
+                      <CategoryCard
+                        key={cat._id}
+                        category={cat}
+                        layout="horizontal"
+                        onPress={handleCategoryPress}
+                      />
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Featured Products */}
+              {featuredProducts.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeading}>Featured Products</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ProductList', {
+                          filterType: 'featured',
+                          title: 'Featured Products',
+                        })
+                      }
+                    >
+                      <Text style={styles.seeAllText}>See All</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.productGrid}>
+                    {featuredProducts.map((prod) => (
+                      <ProductCard
+                        key={prod._id}
+                        product={prod}
+                        onPress={handleProductPress}
+                        style={{ width: cardWidth }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Popular Products */}
+              {popularProducts.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeading}>Trending Now</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ProductList', {
+                          filterType: 'popular',
+                          title: 'Trending Products',
+                        })
+                      }
+                    >
+                      <Text style={styles.seeAllText}>See All</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.productGrid}>
+                    {popularProducts.map((prod) => (
+                      <ProductCard
+                        key={prod._id}
+                        product={prod}
+                        onPress={handleProductPress}
+                        style={{ width: cardWidth }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* New Arrivals */}
+              {newArrivals.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeading}>New Arrivals</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ProductList', {
+                          filterType: 'newArrival',
+                          title: 'New Arrivals',
+                        })
+                      }
+                    >
+                      <Text style={styles.seeAllText}>See All</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.productGrid}>
+                    {newArrivals.map((prod) => (
+                      <ProductCard
+                        key={prod._id}
+                        product={prod}
+                        onPress={handleProductPress}
+                        style={{ width: cardWidth }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Best Sellers */}
+              {bestSellers.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionHeading}>Best Sellers</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('ProductList', {
+                          filterType: 'bestSeller',
+                          title: 'Best Sellers',
+                        })
+                      }
+                    >
+                      <Text style={styles.seeAllText}>See All</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.productGrid}>
+                    {bestSellers.map((prod) => (
+                      <ProductCard
+                        key={prod._id}
+                        product={prod}
+                        onPress={handleProductPress}
+                        style={{ width: cardWidth }}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+        </ScrollView>
       </View>
-
-      {/* Search Input (Tapping opens dedicated search & filters) */}
-      <View style={styles.searchWrapper}>
-        <SearchBar
-          editable={false}
-          onPress={() => navigation.navigate('Search')}
-          placeholder="Search items, brands, categories..."
-        />
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
-        style={{ flex: 1, backgroundColor: colors.background }}
-      >
-        {/* Promotional Hero Banner */}
-        <View style={screenStyles.bannerContainer}>
-          <Text style={screenStyles.bannerTitle}>Super Autumn Sale</Text>
-          <Text style={screenStyles.bannerSubtitle}>Up to 40% OFF on premium gadgets & lifestyle essentials</Text>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('ProductList', { isFeatured: true })}
-            style={styles.bannerBtn}
-          >
-            <Text style={styles.bannerBtnText}>Shop Deals</Text>
-            <Ionicons name="arrow-forward" size={14} color={colors.primary} style={{ marginLeft: 4 }} />
-          </TouchableOpacity>
-        </View>
-
-        {loading ? (
-          <LoadingSpinner message="Fetching latest deals..." />
-        ) : (
-          <>
-            {/* Categories Section */}
-            {categories.length > 0 && (
-              <View style={styles.section}>
-                <View style={screenStyles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>Categories</Text>
-                  <TouchableOpacity onPress={() => navigation.navigate('Categories')}>
-                    <Text style={screenStyles.seeAllText}>See All</Text>
-                  </TouchableOpacity>
-                </View>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.horizontalListContent}
-                >
-                  {categories.map((cat) => (
-                    <CategoryCard
-                      key={cat._id}
-                      category={cat}
-                      layout="horizontal"
-                      onPress={handleCategoryPress}
-                    />
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-
-            {/* Featured Products */}
-            {featuredProducts.length > 0 && (
-              <View style={styles.section}>
-                <View style={screenStyles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>Featured Products</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ProductList', { filterType: 'featured', title: 'Featured Products' })}
-                  >
-                    <Text style={screenStyles.seeAllText}>See All</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.productGrid}>
-                  {featuredProducts.map((prod) => (
-                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Popular Products */}
-            {popularProducts.length > 0 && (
-              <View style={styles.section}>
-                <View style={screenStyles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>Trending Now</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ProductList', { filterType: 'popular', title: 'Trending Products' })}
-                  >
-                    <Text style={screenStyles.seeAllText}>See All</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.productGrid}>
-                  {popularProducts.map((prod) => (
-                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* New Arrivals */}
-            {newArrivals.length > 0 && (
-              <View style={styles.section}>
-                <View style={screenStyles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>New Arrivals</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ProductList', { filterType: 'newArrival', title: 'New Arrivals' })}
-                  >
-                    <Text style={screenStyles.seeAllText}>See All</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.productGrid}>
-                  {newArrivals.map((prod) => (
-                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {/* Best Sellers */}
-            {bestSellers.length > 0 && (
-              <View style={styles.section}>
-                <View style={screenStyles.sectionHeader}>
-                  <Text style={styles.sectionHeading}>Best Sellers</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('ProductList', { filterType: 'bestSeller', title: 'Best Sellers' })}
-                  >
-                    <Text style={screenStyles.seeAllText}>See All</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.productGrid}>
-                  {bestSellers.map((prod) => (
-                    <ProductCard key={prod._id} product={prod} onPress={handleProductPress} />
-                  ))}
-                </View>
-              </View>
-            )}
-          </>
-        )}
-      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+  },
   headerBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -298,14 +356,12 @@ const styles = StyleSheet.create({
     top: -4,
     right: -4,
     backgroundColor: colors.badge,
-    borderRadius: 10,
+    borderRadius: 9,
     minWidth: 18,
     height: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 4,
-    borderWidth: 2,
-    borderColor: colors.surface,
+    paddingHorizontal: 3,
   },
   badgeText: {
     color: colors.white,
@@ -313,11 +369,35 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   searchWrapper: {
+    backgroundColor: colors.surface,
     paddingHorizontal: sizes.base,
     paddingBottom: sizes.sm,
-    backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+  },
+  bannerContainer: {
+    margin: sizes.base,
+    padding: sizes.xl,
+    backgroundColor: colors.primary,
+    borderRadius: sizes.radiusXl,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  bannerTitle: {
+    fontSize: sizes.fontXxl,
+    fontWeight: '900',
+    color: colors.white,
+    letterSpacing: -0.5,
+  },
+  bannerSubtitle: {
+    fontSize: sizes.fontSm,
+    color: colors.primaryLight,
+    marginTop: sizes.xs,
+    marginBottom: sizes.md,
+    lineHeight: 18,
   },
   bannerBtn: {
     flexDirection: 'row',
@@ -334,6 +414,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   section: {
+    marginBottom: sizes.lg,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: sizes.base,
     marginBottom: sizes.sm,
   },
   sectionHeading: {
@@ -341,13 +428,19 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: colors.text,
   },
+  seeAllText: {
+    fontSize: sizes.fontSm,
+    fontWeight: '700',
+    color: colors.primary,
+  },
   horizontalListContent: {
     paddingHorizontal: sizes.base,
+    gap: sizes.sm,
   },
   productGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: 12,
     paddingHorizontal: sizes.base,
   },
 });

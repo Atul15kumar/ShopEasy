@@ -7,6 +7,7 @@ import {
   RefreshControl,
   SafeAreaView,
   StyleSheet,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../constants/colors';
@@ -25,6 +26,10 @@ const SORT_OPTIONS = [
 
 const ProductListScreen = ({ route, navigation }) => {
   const { categoryId, categoryName, filterType, title } = route.params || {};
+  const { width } = useWindowDimensions();
+
+  // Responsive columns: 2 on mobile, 3 on tablet/small screen, 4 on desktop
+  const numColumns = width > 1050 ? 4 : width > 680 ? 3 : 2;
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +47,7 @@ const ProductListScreen = ({ route, navigation }) => {
 
       const params = {
         page: pageNum,
-        limit: 10,
+        limit: 12,
         sort,
       };
 
@@ -91,112 +96,125 @@ const ProductListScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backBtn}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {screenTitle}
-        </Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Search')}
-          style={styles.searchIconBtn}
-        >
-          <Ionicons name="search-outline" size={22} color={colors.text} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Sort Filter Bar */}
-      <View style={styles.sortBar}>
-        <Text style={styles.resultsCount}>
-          {products.length} {products.length === 1 ? 'Product' : 'Products'} found
-        </Text>
-        <TouchableOpacity
-          style={styles.sortSelector}
-          onPress={() => setShowSortDropdown(!showSortDropdown)}
-        >
-          <Ionicons name="swap-vertical" size={16} color={colors.primary} />
-          <Text style={styles.sortText}>
-            {SORT_OPTIONS.find((s) => s.value === sort)?.label || 'Sort'}
+      <View style={styles.outerContainer}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={styles.backBtn}
+          >
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {screenTitle}
           </Text>
-          <Ionicons
-            name={showSortDropdown ? 'chevron-up' : 'chevron-down'}
-            size={14}
-            color={colors.textSecondary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Dropdown menu */}
-      {showSortDropdown && (
-        <View style={styles.dropdownMenu}>
-          {SORT_OPTIONS.map((opt) => (
-            <TouchableOpacity
-              key={opt.value}
-              style={[styles.dropdownItem, sort === opt.value && styles.activeDropdownItem]}
-              onPress={() => {
-                setSort(opt.value);
-                setShowSortDropdown(false);
-              }}
-            >
-              <Text
-                style={[
-                  styles.dropdownItemText,
-                  sort === opt.value && styles.activeDropdownItemText,
-                ]}
-              >
-                {opt.label}
-              </Text>
-              {sort === opt.value && (
-                <Ionicons name="checkmark" size={16} color={colors.primary} />
-              )}
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Search')}
+            style={styles.searchIconBtn}
+          >
+            <Ionicons name="search-outline" size={22} color={colors.text} />
+          </TouchableOpacity>
         </View>
-      )}
 
-      {loading && products.length === 0 ? (
-        <LoadingSpinner message="Fetching items..." fullScreen />
-      ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item._id}
-          numColumns={2}
-          contentContainerStyle={styles.listContent}
-          columnWrapperStyle={styles.columnWrapper}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[colors.primary]}
+        {/* Sort Filter Bar */}
+        <View style={styles.sortBar}>
+          <Text style={styles.resultsCount}>
+            {products.length} {products.length === 1 ? 'Product' : 'Products'} found
+          </Text>
+          <TouchableOpacity
+            style={styles.sortSelector}
+            onPress={() => setShowSortDropdown(!showSortDropdown)}
+          >
+            <Ionicons name="swap-vertical" size={16} color={colors.primary} />
+            <Text style={styles.sortText}>
+              {SORT_OPTIONS.find((s) => s.value === sort)?.label || 'Sort'}
+            </Text>
+            <Ionicons
+              name={showSortDropdown ? 'chevron-up' : 'chevron-down'}
+              size={14}
+              color={colors.textSecondary}
             />
-          }
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.4}
-          ListEmptyComponent={
-            <EmptyState
-              icon="search-outline"
-              title="No Products Found"
-              description="We couldn't find any products in this selection."
-              buttonTitle="Back to Home"
-              onButtonPress={() => navigation.navigate('Home')}
-            />
-          }
-          renderItem={({ item }) => (
-            <ProductCard product={item} onPress={handleProductPress} />
-          )}
-        />
-      )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Dropdown menu */}
+        {showSortDropdown && (
+          <View style={styles.dropdownMenu}>
+            {SORT_OPTIONS.map((opt) => (
+              <TouchableOpacity
+                key={opt.value}
+                style={[styles.dropdownItem, sort === opt.value && styles.activeDropdownItem]}
+                onPress={() => {
+                  setSort(opt.value);
+                  setShowSortDropdown(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.dropdownItemText,
+                    sort === opt.value && styles.activeDropdownItemText,
+                  ]}
+                >
+                  {opt.label}
+                </Text>
+                {sort === opt.value && (
+                  <Ionicons name="checkmark" size={16} color={colors.primary} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {loading && products.length === 0 ? (
+          <LoadingSpinner message="Fetching items..." fullScreen />
+        ) : (
+          <FlatList
+            key={`grid-${numColumns}`}
+            data={products}
+            keyExtractor={(item) => item._id}
+            numColumns={numColumns}
+            contentContainerStyle={styles.listContent}
+            columnWrapperStyle={styles.columnWrapper}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.primary]}
+              />
+            }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.4}
+            ListEmptyComponent={
+              <EmptyState
+                icon="search-outline"
+                title="No Products Found"
+                description="We couldn't find any products in this selection."
+                buttonTitle="Back to Home"
+                onButtonPress={() => navigation.navigate('Home')}
+              />
+            }
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                onPress={handleProductPress}
+                style={{ margin: 4 }}
+              />
+            )}
+          />
+        )}
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -295,10 +313,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   listContent: {
-    padding: sizes.base,
+    padding: sizes.sm,
+    paddingBottom: sizes.xxl,
   },
   columnWrapper: {
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
 });
 

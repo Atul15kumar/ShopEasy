@@ -21,7 +21,7 @@ const ProductCard = ({ product, onPress, style }) => {
     e?.stopPropagation();
     try {
       setIsAdding(true);
-      await addItem(product._id, 1);
+      await addItem(product, 1);
     } catch (err) {
       console.warn('Could not add to cart:', err.message);
     } finally {
@@ -32,7 +32,7 @@ const ProductCard = ({ product, onPress, style }) => {
   const handleToggleWishlist = async (e) => {
     e?.stopPropagation();
     try {
-      await toggleWishlist(product._id);
+      await toggleWishlist(product);
     } catch (err) {
       console.warn('Could not toggle wishlist:', err.message);
     }
@@ -44,11 +44,12 @@ const ProductCard = ({ product, onPress, style }) => {
       onPress={() => onPress && onPress(product)}
       style={[styles.card, style]}
     >
-      {/* Product Image Container */}
+      {/* Product Image Container with crisp 1:1 square ratio */}
       <View style={styles.imageContainer}>
         <ProductImage
           uri={product.images && product.images.length > 0 ? product.images[0] : null}
           style={styles.image}
+          resizeMode="contain"
         />
 
         {/* Discount Badge */}
@@ -123,19 +124,27 @@ const ProductCard = ({ product, onPress, style }) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: sizes.cardWidth,
+    flex: 1,
+    minWidth: 150,
     backgroundColor: colors.surface,
     borderRadius: sizes.radiusLg,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
     marginBottom: sizes.base,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   imageContainer: {
     width: '100%',
-    height: 155,
-    backgroundColor: colors.surfaceMuted,
+    aspectRatio: 1,
+    backgroundColor: '#F8FAFC',
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     width: '100%',
@@ -149,6 +158,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: sizes.xs * 1.5,
     paddingVertical: 2,
     borderRadius: sizes.radiusSm,
+    zIndex: 2,
   },
   discountTagText: {
     color: colors.white,
@@ -159,9 +169,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: sizes.sm,
     right: sizes.sm,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -169,7 +179,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
+    zIndex: 2,
   },
   infoContainer: {
     padding: sizes.md,
@@ -186,8 +197,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginTop: 2,
-    height: 36,
-    lineHeight: 18,
+    height: 38,
+    lineHeight: 19,
   },
   ratingRow: {
     flexDirection: 'row',

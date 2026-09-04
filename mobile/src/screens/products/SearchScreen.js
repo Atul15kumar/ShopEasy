@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StyleSheet,
   TextInput,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../constants/colors';
@@ -93,178 +94,198 @@ const SearchScreen = ({ navigation }) => {
     executeSearch(query, '', PRICE_RANGES[0], '', 'newest');
   };
 
+  const handleCategorySelect = (catId) => {
+    setSelectedCategory(catId);
+    executeSearch(query, catId, selectedPriceRange, minRating, sortBy);
+  };
+
+  const handlePriceSelect = (range) => {
+    setSelectedPriceRange(range);
+    executeSearch(query, selectedCategory, range, minRating, sortBy);
+  };
+
+  const handleQueryChange = (text) => {
+    setQuery(text);
+    executeSearch(text, selectedCategory, selectedPriceRange, minRating, sortBy);
+  };
+
+  const { width } = useWindowDimensions();
+  const numColumns = width > 1050 ? 4 : width > 680 ? 3 : 2;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Search Header */}
-      <View style={styles.searchHeader}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backBtn}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-
-        <View style={styles.searchBarWrapper}>
-          <SearchBar
-            value={query}
-            onChangeText={(text) => {
-              setQuery(text);
-              executeSearch(text, selectedCategory, selectedPriceRange, minRating, sortBy);
-            }}
-            onSubmitEditing={() => executeSearch()}
-            onClear={() => {
-              setQuery('');
-              executeSearch('', selectedCategory, selectedPriceRange, minRating, sortBy);
-            }}
-            placeholder="Search by keyword, brand..."
-          />
-        </View>
-      </View>
-
-      {/* Filter Horizontal Scroll Area */}
-      <View style={styles.filterSection}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-          {/* Category Chips */}
+      <View style={styles.outerContainer}>
+        {/* Search Input Bar */}
+        <View style={styles.searchHeader}>
           <TouchableOpacity
-            style={[styles.chip, !selectedCategory && styles.activeChip]}
-            onPress={() => {
-              setSelectedCategory('');
-              executeSearch(query, '', selectedPriceRange, minRating, sortBy);
-            }}
+            onPress={() => navigation.goBack()}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={styles.backBtn}
           >
-            <Text style={[styles.chipText, !selectedCategory && styles.activeChipText]}>
-              All Categories
-            </Text>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-
-          {categories.map((cat) => (
-            <TouchableOpacity
-              key={cat._id}
-              style={[styles.chip, selectedCategory === cat._id && styles.activeChip]}
-              onPress={() => {
-                const next = selectedCategory === cat._id ? '' : cat._id;
-                setSelectedCategory(next);
-                executeSearch(query, next, selectedPriceRange, minRating, sortBy);
+          <View style={styles.searchBarWrapper}>
+            <SearchBar
+              value={query}
+              onChangeText={handleQueryChange}
+              onSubmitEditing={() =>
+                executeSearch(query, selectedCategory, selectedPriceRange, minRating, sortBy)
+              }
+              onClear={() => {
+                setQuery('');
+                executeSearch('', selectedCategory, selectedPriceRange, minRating, sortBy);
               }}
+              placeholder="Search products..."
+              autoFocus={true}
+            />
+          </View>
+        </View>
+
+        {/* Filter Section */}
+        <View style={styles.filterSection}>
+          {/* Categories Filter Row */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterRow}
+          >
+            <TouchableOpacity
+              style={[styles.chip, !selectedCategory && styles.activeChip]}
+              onPress={() => handleCategorySelect('')}
             >
-              <Text
-                style={[
-                  styles.chipText,
-                  selectedCategory === cat._id && styles.activeChipText,
-                ]}
-              >
-                {cat.name}
+              <Text style={[styles.chipText, !selectedCategory && styles.activeChipText]}>
+                All Categories
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+            {categories.map((c) => (
+              <TouchableOpacity
+                key={c._id}
+                style={[styles.chip, selectedCategory === c._id && styles.activeChip]}
+                onPress={() => handleCategorySelect(c._id)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    selectedCategory === c._id && styles.activeChipText,
+                  ]}
+                >
+                  {c.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
-        {/* Price & Rating chips */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.filterRow, { marginTop: sizes.xs }]}
-        >
-          {PRICE_RANGES.map((range, index) => (
+          {/* Price Range Filter Row */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.filterRow, { marginTop: sizes.xs }]}
+          >
+            {PRICE_RANGES.map((range) => (
+              <TouchableOpacity
+                key={range.label}
+                style={[
+                  styles.smallChip,
+                  selectedPriceRange.label === range.label && styles.activeSmallChip,
+                ]}
+                onPress={() => handlePriceSelect(range)}
+              >
+                <Text
+                  style={[
+                    styles.smallChipText,
+                    selectedPriceRange.label === range.label && styles.activeSmallChipText,
+                  ]}
+                >
+                  {range.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            {/* 4+ Stars Filter */}
             <TouchableOpacity
-              key={index}
-              style={[
-                styles.smallChip,
-                selectedPriceRange.label === range.label && styles.activeSmallChip,
-              ]}
+              style={[styles.smallChip, minRating === '4' && styles.activeSmallChip]}
               onPress={() => {
-                setSelectedPriceRange(range);
-                executeSearch(query, selectedCategory, range, minRating, sortBy);
+                const next = minRating === '4' ? '' : '4';
+                setMinRating(next);
+                executeSearch(query, selectedCategory, selectedPriceRange, next, sortBy);
               }}
             >
+              <Ionicons
+                name="star"
+                size={12}
+                color={minRating === '4' ? colors.white : colors.star}
+                style={{ marginRight: 3 }}
+              />
               <Text
                 style={[
                   styles.smallChipText,
-                  selectedPriceRange.label === range.label && styles.activeSmallChipText,
+                  minRating === '4' && styles.activeSmallChipText,
                 ]}
               >
-                {range.label}
+                4★ & above
               </Text>
             </TouchableOpacity>
-          ))}
 
-          {/* 4+ Stars Filter */}
-          <TouchableOpacity
-            style={[styles.smallChip, minRating === '4' && styles.activeSmallChip]}
-            onPress={() => {
-              const next = minRating === '4' ? '' : '4';
-              setMinRating(next);
-              executeSearch(query, selectedCategory, selectedPriceRange, next, sortBy);
-            }}
-          >
-            <Ionicons
-              name="star"
-              size={12}
-              color={minRating === '4' ? colors.white : colors.star}
-              style={{ marginRight: 3 }}
-            />
-            <Text
-              style={[
-                styles.smallChipText,
-                minRating === '4' && styles.activeSmallChipText,
-              ]}
-            >
-              4★ & above
-            </Text>
-          </TouchableOpacity>
+            {/* Reset Filters */}
+            {(selectedCategory || selectedPriceRange.label !== 'All' || minRating) && (
+              <TouchableOpacity style={styles.resetBtn} onPress={handleResetFilters}>
+                <Ionicons name="refresh" size={12} color={colors.danger} style={{ marginRight: 2 }} />
+                <Text style={styles.resetBtnText}>Reset</Text>
+              </TouchableOpacity>
+            )}
+          </ScrollView>
+        </View>
 
-          {/* Reset Filters */}
-          {(selectedCategory || selectedPriceRange.label !== 'All' || minRating) && (
-            <TouchableOpacity style={styles.resetBtn} onPress={handleResetFilters}>
-              <Ionicons name="refresh" size={12} color={colors.danger} style={{ marginRight: 2 }} />
-              <Text style={styles.resetBtnText}>Reset</Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
+        {/* Results Header */}
+        <View style={styles.metaRow}>
+          <Text style={styles.resultsLabel}>
+            {products.length} {products.length === 1 ? 'result' : 'results'}
+          </Text>
+        </View>
+
+        {/* Product Results Grid */}
+        {loading ? (
+          <LoadingSpinner message="Searching products..." fullScreen />
+        ) : (
+          <FlatList
+            key={`search-grid-${numColumns}`}
+            data={products}
+            keyExtractor={(item) => item._id}
+            numColumns={numColumns}
+            contentContainerStyle={styles.listContent}
+            columnWrapperStyle={numColumns > 1 ? styles.columnWrapper : undefined}
+            ListEmptyComponent={
+              <EmptyState
+                icon="search-outline"
+                title="No Results Found"
+                description="Try adjusting your keywords or clearing the active filters."
+                buttonTitle="Reset Filters"
+                onButtonPress={handleResetFilters}
+              />
+            }
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                style={{ margin: 4 }}
+                onPress={(prod) =>
+                  navigation.navigate('ProductDetails', { productId: prod._id })
+                }
+              />
+            )}
+          />
+        )}
       </View>
-
-      {/* Results Header */}
-      <View style={styles.metaRow}>
-        <Text style={styles.resultsLabel}>
-          {products.length} {products.length === 1 ? 'result' : 'results'}
-        </Text>
-      </View>
-
-      {/* Product Results Grid */}
-      {loading ? (
-        <LoadingSpinner message="Searching products..." fullScreen />
-      ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item._id}
-          numColumns={2}
-          contentContainerStyle={styles.listContent}
-          columnWrapperStyle={styles.columnWrapper}
-          ListEmptyComponent={
-            <EmptyState
-              icon="search-outline"
-              title="No Results Found"
-              description="Try adjusting your keywords or clearing the active filters."
-              buttonTitle="Reset Filters"
-              onButtonPress={handleResetFilters}
-            />
-          }
-          renderItem={({ item }) => (
-            <ProductCard
-              product={item}
-              onPress={(prod) =>
-                navigation.navigate('ProductDetails', { productId: prod._id })
-              }
-            />
-          )}
-        />
-      )}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+  },
   searchHeader: {
     flexDirection: 'row',
     alignItems: 'center',

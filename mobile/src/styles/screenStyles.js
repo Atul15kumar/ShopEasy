@@ -118,11 +118,16 @@ const screenStyles = StyleSheet.create({
 
   // Product Details Screen
   detailsImageContainer: {
-    width: sizes.screenWidth,
-    height: 320,
-    backgroundColor: colors.surface,
+    width: '100%',
+    maxWidth: 550,
+    aspectRatio: 1,
+    maxHeight: 400,
+    alignSelf: 'center',
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: sizes.radiusLg,
+    overflow: 'hidden',
   },
   detailsContent: {
     padding: sizes.base,

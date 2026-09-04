@@ -1,0 +1,8 @@
+{
+  "name": "shopeasy-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd mobile && npm install && npx expo export --platform web"
+  }
+}

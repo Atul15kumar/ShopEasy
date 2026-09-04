@@ -91,8 +91,9 @@ const ProductDetailsScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      {/* Top Header Bar */}
-      <View style={styles.header}>
+      <View style={styles.outerContainer}>
+        {/* Top Header Bar */}
+        <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -286,6 +287,7 @@ const ProductDetailsScreen = ({ route, navigation }) => {
           disabled={isOutOfStock}
           style={{ flex: 1 }}
         />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -331,9 +333,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
   },
+  outerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 900,
+    alignSelf: 'center',
+  },
   mainImage: {
-    width: sizes.screenWidth - 40,
-    height: 280,
+    width: '100%',
+    height: '100%',
+    maxWidth: 480,
+    maxHeight: 380,
   },
   discountTag: {
     position: 'absolute',
